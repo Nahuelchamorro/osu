@@ -40,6 +40,10 @@ namespace osu.Game.Screens
             while (screen.LoadState < LoadState.Ready)
                 Thread.Sleep(1);
 
+            // we may have since been exited
+            if (!IsCurrentScreen)
+                return;
+
             try
             {
                 base.Push(screen);

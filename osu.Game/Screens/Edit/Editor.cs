@@ -4,7 +4,6 @@
 using System;
 using osuTK.Graphics;
 using osu.Framework.Screens;
-using osu.Game.Screens.Backgrounds;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -20,14 +19,13 @@ using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
+using osu.Game.Screens.Play;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit
 {
-    public class Editor : OsuScreen
+    public class Editor : ScreenWithBeatmapBackground
     {
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
-
         protected override bool HideOverlaysOnEnter => true;
         public override bool AllowBeatmapRulesetChange => false;
 
