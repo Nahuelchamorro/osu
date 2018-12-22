@@ -9,6 +9,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.MathUtils;
+using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
@@ -39,9 +41,65 @@ namespace osu.Game.Screens.Menu
         private CircularContainer yellowCircle;
         private CircularContainer purpleCircle;
 
+
+        private readonly FramedClock clock;
+        private ManualClock manualClock;
+        private IFrameBasedClock baseClock;
+
+        public override bool RemoveCompletedTransforms => false;
+
+        private double startTime;
+
         public IntroSequence()
         {
             RelativeSizeAxes = Axes.Both;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            double offset = startTime + Intro.MUSIC_START_DELAY + 380;
+
+            var rTime = baseClock.CurrentTime;
+
+            const double stutter_start = 1050;
+
+            const double beat_1 = 1520;
+            const double beat_2 = 1720;
+            const double beat_3 = 1920;
+            const double beat_4 = 2110;
+            const double intro_end = 3370;
+
+            if (rTime < stutter_start + offset)
+                manualClock.CurrentTime = baseClock.CurrentTime;
+            else if (rTime < beat_1 + offset)
+                manualClock.CurrentTime = (stutter_start + offset - 400) + ((baseClock.CurrentTime - (stutter_start + offset)) * 8) % 400;
+            else if (rTime < beat_2 + offset)
+                manualClock.CurrentTime = beat_3 + offset;
+            else if (rTime < beat_3 + offset)
+                manualClock.CurrentTime = beat_4 + offset + 150;
+            else if (rTime < beat_4 + offset)
+                manualClock.CurrentTime = beat_2 + offset;
+            else if (rTime < intro_end + offset)
+            {
+                manualClock.CurrentTime = beat_4 + offset + Interpolation.ValueAt((baseClock.CurrentTime - (beat_4 + offset)) / (intro_end - beat_4), 0, intro_end - beat_2, 0, 1, Easing.In);
+            }
+            else
+                manualClock.CurrentTime = baseClock.CurrentTime;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            baseClock = Clock;
+
+            Clock = new FramedClock(manualClock = new ManualClock()
+            {
+                CurrentTime = baseClock.CurrentTime,
+                Rate = baseClock.Rate,
+                IsRunning = true
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -57,7 +115,7 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Children = new []
+                    Children = new[]
                     {
                         lineTopLeft = new Box
                         {
@@ -175,6 +233,8 @@ namespace osu.Game.Screens.Menu
 
         public void Start(double length)
         {
+            startTime = base.Clock.CurrentTime;
+
             if (Children.Any())
             {
                 // restart if we were already run previously.

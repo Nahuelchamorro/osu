@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Menu
 {
     public class Intro : OsuScreen
     {
-        private const string menu_music_beatmap_hash = "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
+        private const string menu_music_beatmap_hash = "xx3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
 
         /// <summary>
         /// Whether we have loaded the menu previously.
@@ -45,6 +45,7 @@ namespace osu.Game.Screens.Menu
         private Bindable<bool> menuMusic;
         private Track track;
         private WorkingBeatmap introBeatmap;
+        private bool usedMenuMusic;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game, BindableBeatmap beatmap)
@@ -69,8 +70,10 @@ namespace osu.Game.Screens.Menu
 
                 if (setInfo == null)
                 {
+                    usedMenuMusic = true;
+
                     // we need to import the default menu background beatmap
-                    setInfo = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream(@"Tracks/circles.osz"), "circles.osz"));
+                    setInfo = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream(@"Tracks/triangles.osz"), "triangles.osz"));
 
                     setInfo.Protected = true;
                     beatmaps.Update(setInfo);
@@ -84,8 +87,8 @@ namespace osu.Game.Screens.Menu
             seeya = audio.Sample.Get(@"seeya");
         }
 
-        private const double delay_step_one = 2300;
-        private const double delay_step_two = 600;
+        private const double delay_step_one = 2800;
+        public const double MUSIC_START_DELAY = 0;
 
         public const int EXIT_DELAY = 3000;
 
@@ -97,7 +100,7 @@ namespace osu.Game.Screens.Menu
             {
                 beatmap.Value = introBeatmap;
 
-                if (menuVoice)
+                if (menuVoice && !usedMenuMusic)
                     welcome.Play();
 
                 Scheduler.AddDelayed(delegate
@@ -113,7 +116,7 @@ namespace osu.Game.Screens.Menu
                         DidLoadMenu = true;
                         Push(mainMenu);
                     }, delay_step_one);
-                }, delay_step_two);
+                }, MUSIC_START_DELAY);
             }
 
             logo.RelativePositionAxes = Axes.Both;
