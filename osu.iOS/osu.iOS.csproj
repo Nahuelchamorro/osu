@@ -9,6 +9,9 @@
     <RootNamespace>osu.iOS</RootNamespace>
     <AssemblyName>osu.iOS</AssemblyName>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+    <CodesignKey>iPhone Distribution</CodesignKey>
+  </PropertyGroup>
   <Import Project="..\osu.iOS.props" />
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
